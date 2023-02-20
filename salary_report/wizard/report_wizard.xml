@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_salary_report_wizard" model="ir.ui.view">
+        <field name="name">salary.report.wizard</field>
+        <field name="model">salary.report.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generate Salary Report">
+                <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                    <field name="number_of_day"/>
+                    <field name="month"/>
+                </group>
+                <footer>
+                    <span>
+                        <button string="Generate" type="object" name="generate_report_excel"
+                                class="oe_highlight"/>
+                        <button special="cancel" string="Close" type="object"/>
+                    </span>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_view_salary_report_wizard" model="ir.actions.act_window">
+        <field name="name">Salary Report Wizard Action</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">salary.report.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_salary_report_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_hr_payroll_salary_report" name="Salary Report"
+              action="action_view_salary_report_wizard"
+              parent="hr_payroll_community.menu_hr_payroll_community_root"
+              sequence="30" groups="hr_payroll_community.group_hr_payroll_community_manager"/>
+</odoo>
