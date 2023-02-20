@@ -2,7 +2,7 @@
 <odoo>
   <record id="salary_report_xlsx" model="ir.actions.report">
     <field name="name">Salary Report Excel</field>
-    <field name="model">report.payroll.salary_report</field>
+    <field name="model">report.salary_report.report_xlsx</field>
     <field name="report_type">xlsx</field>
     <field name="report_name">salary_report.report_xlsx</field>
     <field name="report_file">Salary Report</field>

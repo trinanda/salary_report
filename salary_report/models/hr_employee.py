@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-
 from odoo import fields, models, api
 
 
@@ -17,4 +16,12 @@ class HrEmployeePrivate(models.Model):
     @api.depends('address_home_id')
     def _compute_employee_private_address(self):
         for rec in self:
-            rec.employee_private_address = f"{rec.address_home_id.street}, {rec.address_home_id.street2}, {rec.address_home_id.city}, {rec.address_home_id.state_id.name}, {rec.address_home_id.zip}, {rec.address_home_id.country_id.name}"
+            if rec.address_home_id:
+                rec.employee_private_address = f"{rec.address_home_id.street + ',' if rec.address_home_id.street else ''} " \
+                                               f"{rec.address_home_id.street2 + ',' if rec.address_home_id.street2 else ''} " \
+                                               f"{rec.address_home_id.city + ',' if rec.address_home_id.city else ''} " \
+                                               f"{rec.address_home_id.state_id.name + ',' if rec.address_home_id.state_id.name else ''} " \
+                                               f"{rec.address_home_id.zip + ',' if rec.address_home_id.zip else ''} " \
+                                               f"{rec.address_home_id.country_id.name if rec.address_home_id.country_id.name else ''}"
+            else:
+                rec.employee_private_address = ""

@@ -9,6 +9,7 @@
                 <xpath expr="//group[@name='payroll_group']" position="inside">
                     <field name="employee_bank_code"/>
                     <field name="employee_account_number"/>
+                    <field name="employee_private_address"/>
                 </xpath>
             </field>
         </record>
