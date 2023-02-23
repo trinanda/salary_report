@@ -9,10 +9,14 @@ from odoo import api, fields, models, _
 class SalaryReportWizard(models.TransientModel):
     _name = 'salary.report.wizard'
 
+    report_type = fields.Selection(
+        [('wage_protection_report', 'Wage Protection Report'), ('salary_report', 'Salary Report')],
+        default='wage_protection_report', required=True)
     start_date = fields.Date(required=True)
     end_date = fields.Date(required=True)
     number_of_day = fields.Integer(compute='_compute_number_of_day', store=True)
     value_date = fields.Date(required=True)
+    debit_date = fields.Date(required=True)
     year = fields.Selection([(str(num), str(num)) for num in range(1900, 2101)], string='Year', required=True,
                             default=str(datetime.now().year))
 

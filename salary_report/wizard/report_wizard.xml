@@ -5,26 +5,27 @@
         <field name="model">salary.report.wizard</field>
         <field name="arch" type="xml">
             <form string="Generate Salary Report">
+                <group>
+                    <field name="report_type" options="{'horizontal': True}" widget="radio"/>
+                </group>
+                <group col="2" attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}">
+                    <field name="year"/>
+                    <field name="month"/>
+                </group>
+                <group col="2" attrs="{'invisible': [('report_type', '!=', 'salary_report')]}">
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                </group>
                 <group col="2">
-                    <group>
-                        <field name="year"/>
-                        <field name="start_date"/>
-                    </group>
-                    <group>
-                        <field name="month"/>
-                        <field name="end_date"/>
-                    </group>
-                    <group>
-                        <field name="number_of_day"/>
-                    </group>
-                    <group>
-                        <field name="value_date"/>
-                    </group>
+                    <field name="debit_date" attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}"/>
+                    <field name="value_date"/>
+                </group>
+                <group>
+                    <field name="number_of_day"/>
                 </group>
                 <footer>
                     <span>
-                        <button string="Generate" type="object" name="generate_report_excel"
-                                class="oe_highlight"/>
+                        <button string="Generate" type="object" name="generate_report_excel" class="oe_highlight"/>
                         <button special="cancel" string="Close" type="object"/>
                     </span>
                 </footer>
@@ -33,7 +34,7 @@
     </record>
 
     <record id="action_view_salary_report_wizard" model="ir.actions.act_window">
-        <field name="name">Salary Report Wizard</field>
+        <field name="name">Generate Report</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">salary.report.wizard</field>
         <field name="view_mode">form</field>

@@ -10,21 +10,72 @@ class SalaryReportXlsx(models.AbstractModel):
 
     def generate_xlsx_report(self, workbook, data, objs):
         self.env.cr.execute("""
-                            SELECT e.identification_id, e.name, e.employee_bank_code, e.employee_account_number,
-                            SUM(CASE WHEN l.code = 'NET' THEN l.amount END) as net_salary,
-                            SUM(CASE WHEN l.code = 'BASIC' THEN l.amount END) as basic_salary,
-                            SUM(CASE WHEN l.code = 'HRA' THEN l.amount END) as house_rent_allowance,
-                            SUM(CASE WHEN l.code = 'Other' THEN l.amount END) as other_allowance,
-                            SUM(CASE WHEN l.code = 'PT' THEN l.amount END) as deductions,
-                            p.name as payslip_reference, e.employee_private_address
-                            FROM hr_payslip p
-                            INNER JOIN hr_employee e ON p.employee_id = e.id
-                            INNER JOIN hr_payslip_line l ON p.id = l.slip_id
-                            WHERE p.date_from >= %s AND p.date_to <= %s AND p.state = 'done'
-                            GROUP BY p.name, e.identification_id, e.name, e.employee_bank_code, e.employee_account_number, 
-                            e.employee_private_address
+                            SELECT 
+                              e.identification_id, 
+                              e.name, 
+                              e.employee_bank_code, 
+                              e.employee_account_number, 
+                              SUM(
+                                CASE WHEN hsrc.name ->> 'en_US' = 'Net' THEN l.amount END
+                              ) as net_salary, 
+                              SUM(
+                                CASE WHEN hsrc.name ->> 'en_US' = 'Basic' THEN l.amount END
+                              ) as basic_salary, 
+                              SUM(
+                                CASE WHEN hsrc.name ->> 'en_US' = 'بدل سكن' THEN l.amount END
+                              ) as house_rent_allowance, 
+                              SUM(
+                                CASE WHEN hsrc.name ->> 'en_US' = 'بدلات أخرى' THEN l.amount END
+                              ) as other_allowance, 
+                              SUM(
+                                CASE WHEN hsrc.name ->> 'en_US' = 'Deduction' THEN l.amount END
+                              ) as deductions, 
+                              p.number as payslip_reference, 
+                              COALESCE(employee_address, '') as employee_address 
+                            FROM 
+                              hr_payslip p 
+                              INNER JOIN hr_employee e ON p.employee_id = e.id 
+                              INNER JOIN hr_payslip_line l ON p.id = l.slip_id 
+                              INNER JOIN hr_salary_rule hs ON hs.id = l.salary_rule_id 
+                              INNER JOIN hr_salary_rule_category hsrc ON hsrc.id = hs.category_id 
+                              LEFT JOIN (
+                                SELECT 
+                                  e.id as employee_id, 
+                                  string_agg(
+                                    concat_ws(
+                                      ', ', 
+                                      NULLIF(pa.street, ''), 
+                                      NULLIF(pa.street2, ''), 
+                                      NULLIF(pa.city, ''), 
+                                      NULLIF(state.name, ''), 
+                                      NULLIF(pa.zip, ''), 
+                                      NULLIF(country.name ->> 'en_US', '')
+                                    ), 
+                                    ', '
+                                  ) as employee_address 
+                                FROM 
+                                  hr_employee e 
+                                  LEFT JOIN res_partner pa ON e.address_home_id = pa.id 
+                                  LEFT JOIN res_country country ON pa.country_id = country.id 
+                                  LEFT JOIN res_country_state state ON pa.state_id = state.id 
+                                GROUP BY 
+                                  e.id
+                              ) as addresses ON e.id = addresses.employee_id 
+                            WHERE 
+                              p.date_from >= %s
+                              AND p.date_to <= %s
+                              AND p.state = 'done' 
+                            GROUP BY 
+                              p.number, 
+                              e.identification_id, 
+                              e.name, 
+                              e.employee_bank_code, 
+                              e.employee_account_number, 
+                              employee_address;
                         """, (data['date_start'], data['date_stop']))
         result = self.env.cr.dictfetchall()
+        # print('result',result)
+        print("data['date_start']", data['date_start'])
         company = self.env.company
         bank_name = None
         bank_code = None
@@ -92,7 +143,7 @@ class SalaryReportXlsx(models.AbstractModel):
             sheet.write(row_line, col + 7, dt['other_allowance'])
             sheet.write(row_line, col + 8, dt['deductions'])
             sheet.write(row_line, col + 9, dt['payslip_reference'])
-            sheet.write(row_line, col + 10, dt['employee_private_address'])
+            sheet.write(row_line, col + 10, dt['employee_address'])
 
         sheet.write(0, 1, company.name)
         sheet.write(1, 1, company.company_registry if company.company_registry else None)
