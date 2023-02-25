@@ -8,6 +8,10 @@
                 <group>
                     <field name="report_type" options="{'horizontal': True}" widget="radio"/>
                 </group>
+                <group>
+                    <field name="file_reference"
+                           attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}"/>
+                </group>
                 <group col="2" attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}">
                     <field name="year"/>
                     <field name="month"/>
@@ -25,7 +29,7 @@
                 </group>
                 <footer>
                     <span>
-                        <button string="Generate" type="object" name="generate_report_excel" class="oe_highlight"/>
+                        <button string="Generate" type="object" name="generate_report" class="oe_highlight"/>
                         <button special="cancel" string="Close" type="object"/>
                     </span>
                 </footer>

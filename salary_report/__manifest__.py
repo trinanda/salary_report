@@ -3,11 +3,10 @@
     'name': "salary_report",
 
     'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+        Generate Wage Protection Report and Salary Report""",
 
     'description': """
-        Long description of module's purpose
+        Generate Wage Protection Report and Salary Report for Saudi Arabia Government
     """,
 
     'author': "Tri Nanda",
