@@ -13,16 +13,16 @@
                            attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}"/>
                 </group>
                 <group col="2" attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}">
-                    <field name="year"/>
-                    <field name="month"/>
+                    <field name="year" attrs="{'required': [('report_type', '=', 'wage_protection_report')]}"/>
+                    <field name="month" attrs="{'required': [('report_type', '=', 'wage_protection_report')]}"/>
                 </group>
                 <group col="2" attrs="{'invisible': [('report_type', '!=', 'salary_report')]}">
-                    <field name="start_date"/>
-                    <field name="end_date"/>
+                    <field name="start_date" attrs="{'required': [('report_type', '=', 'salary_report')]}"/>
+                    <field name="end_date" attrs="{'required': [('report_type', '=', 'salary_report')]}"/>
                 </group>
                 <group col="2">
                     <field name="debit_date" attrs="{'invisible': [('report_type', '!=', 'wage_protection_report')]}"/>
-                    <field name="value_date"/>
+                    <field name="value_date" attrs="{'required': [('report_type', '=', 'wage_protection_report')]}"/>
                 </group>
                 <group>
                     <field name="number_of_day"/>

@@ -13,13 +13,13 @@ class SalaryReportWizard(models.TransientModel):
     report_type = fields.Selection(
         [('wage_protection_report', 'Wage Protection Report'), ('salary_report', 'Salary Report')],
         default='wage_protection_report', required=True)
-    start_date = fields.Date(required=True)
-    end_date = fields.Date(required=True)
+    start_date = fields.Date()
+    end_date = fields.Date()
     number_of_day = fields.Integer(compute='_compute_number_of_day', store=True)
     file_reference = fields.Char()
-    value_date = fields.Date(required=True)
+    value_date = fields.Date()
     debit_date = fields.Date()
-    year = fields.Selection([(str(num), str(num)) for num in range(1900, 2101)], string='Year', required=True,
+    year = fields.Selection([(str(num), str(num)) for num in range(1900, 2101)], string='Year',
                             default=str(datetime.now().year))
 
     month = fields.Selection([
@@ -35,7 +35,7 @@ class SalaryReportWizard(models.TransientModel):
         ('10', 'October'),
         ('11', 'November'),
         ('12', 'December'),
-    ], string='Month', required=True)
+    ], string='Month')
 
     wage_protection_report_file = fields.Binary("My file")
 
@@ -158,12 +158,12 @@ class SalaryReportWizard(models.TransientModel):
             text = f"{self.generate_data()['bank_name']}\t{self.generate_data()['company_registry']}\t" \
                    f"{self.generate_data()['acc_number']}\t\t\t{self.generate_data()['currency']}\t{self.value_date}\t" \
                    f"{self.generate_data()['total_amount']}\t{self.debit_date}\t{self.file_reference}\t\t\t" \
-                   f"{self.generate_data()['employer_id']}"
+                   f"{self.generate_data()['employer_id']}\n"
             for record in self.generate_data()['query']:
-                text += f"{record['net_salary']}\t{record['employee_account_number']}\t\t\t\t{record['employee_name']}" \
-                        f"\t\t\t\t{record['employee_bank_code']}\t{record['payment_description']}\t{record['net_salary']}" \
-                        f"\t{record['basic_salary']}\t{record['house_rent_allowance']}\t{record['other_allowance']}" \
-                        f"\t{record['identification_id']}" \
+                text += f"{record['net_salary']}\t\t\t{record['employee_account_number']}\t\t\t\t{record['employee_name']}" \
+                        f"\t\t\t\t{record['employee_bank_code']}\t\t\t\t{record['payment_description']}\t\t\t{record['net_salary']}" \
+                        f"\t\t\t{record['basic_salary']}\t\t\t{record['house_rent_allowance']}\t\t\t{record['other_allowance']}" \
+                        f"\t\t\t{record['identification_id']}" \
                         f"\n"
             text += '-'
             self.wage_protection_report_file = base64.b64encode(text.encode())
@@ -172,3 +172,9 @@ class SalaryReportWizard(models.TransientModel):
                 'url': '/web/content/salary.report.wizard/%s/wage_protection_report_file/%s?download=true' % (
                     self.id, "Wage Protection Report.txt"),
             }
+
+    @api.onchange('report_type')
+    def _onchange_report_type(self):
+        if self.report_type == 'salary_report':
+            self.start_date = False
+            self.end_date = False

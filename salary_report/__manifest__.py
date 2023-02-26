@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "salary_report",
+    'name': "Salary Report",
 
     'summary': """
         Generate Wage Protection Report and Salary Report""",
